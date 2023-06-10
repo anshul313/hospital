@@ -1,7 +1,12 @@
+//require models to query with database collection in functions
 var Patient = require("../models/patient");
 var Report  = require("../models/report");
+// getting access of jwt from jsonwebtoken to create new token using jwt.sign method
 const jwt = require("jsonwebtoken");
+// getting .env variable access here
 const dotenv = require("dotenv").config();
+
+//creating function to register new patient
 
 module.exports.register = async function (req, res) {
   var data = {
@@ -10,9 +15,11 @@ module.exports.register = async function (req, res) {
     name: req.body.name,
     password: req.body.password,
   };
+  // query create to create new patient
  var newpatient= await Patient.create(data);
     if (newpatient) {
       delete newpatient.password;
+      // sending response
       return res.status(200).json({
         data: newpatient,
         error: false
@@ -20,6 +27,7 @@ module.exports.register = async function (req, res) {
     }
 
 };
+// creating function to login patient using  email and password
 
 module.exports.login = async function (req, res) {
   const user = await Patient.findOne({ email: req.body.email });
@@ -28,13 +36,16 @@ module.exports.login = async function (req, res) {
     console.log("body", req.body.password);
     console.log("user", user.password);
     console.log("user", user);
+      // checking password mismatch
     if (req.body.password != user.password) {
+       // sending response
       return res.status(500).json({
         data: null,
         error: true,
-        message: "invalid password",
+        message: "mismatch  password",
       });
     } else {
+      // sending response
       return res.status(200).json({
         token: token,
         error: false,
@@ -43,7 +54,7 @@ module.exports.login = async function (req, res) {
     }
   }
 };
-
+// creating function to create new report of patient
 module.exports.create_report = async function(req,res){
     var data = {
       doctor_id: req.body.doctor_id,
